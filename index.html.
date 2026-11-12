@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alen · The autistic person</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #0b0f0a;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(34, 197, 94, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(234, 179, 8, 0.06) 0%, transparent 40%),
+                #0b0f0a;
+            z-index: -2;
+        }
+
+        .deco {
+            position: fixed;
+            font-size: 1.8rem;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+            animation: floatDeco 9s infinite ease-in-out;
+        }
+
+        @keyframes floatDeco {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-25px) rotate(8deg); }
+        }
+
+        .container {
+            text-align: center;
+            max-width: 520px;
+            width: 100%;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: clamp(1.7rem, 6vw, 2.6rem);
+            font-weight: 700;
+            margin-bottom: 8px;
+            animation: glow 2.5s ease-in-out infinite alternate;
+        }
+
+        h1 span {
+            color: #4ade80;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 8px rgba(74, 222, 128, 0.3); }
+            to { text-shadow: 0 0 22px rgba(74, 222, 128, 0.6); }
+        }
+
+        .subtitle {
+            color: #86efac;
+            margin-bottom: 28px;
+            font-size: 1.15rem;
+        }
+
+        .btn {
+            background: transparent;
+            border: 2px solid #4ade80;
+            color: #4ade80;
+            padding: 14px 36px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 8px;
+        }
+
+        .btn:hover {
+            background: #4ade80;
+            color: #0b0f0a;
+            box-shadow: 0 0 25px rgba(74, 222, 128, 0.45);
+        }
+
+        .quiz-section, .result-section {
+            display: none;
+            animation: fadeIn 0.45s ease;
+        }
+
+        .quiz-section.active, .result-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-box {
+            background: rgba(20, 30, 20, 0.7);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            border-radius: 18px;
+            padding: 24px 18px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(6px);
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .question-img {
+            width: 100%;
+            max-height: 190px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(74, 222, 128, 0.2);
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: white;
+            padding: 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.25s ease;
+        }
+
+        .option-btn:hover {
+            background: rgba(74, 222, 128, 0.15);
+            border-color: #4ade80;
+        }
+
+        .option-btn.selected {
+            background: #4ade80;
+            color: #0b0f0a;
+            border-color: #4ade80;
+            font-weight: 600;
+        }
+
+        .score-box {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #4ade80;
+            margin: 18px 0;
+        }
+
+        .alen-photo {
+            max-width: 280px;
+            width: 100%;
+            border-radius: 16px;
+            margin: 18px auto;
+            border: 3px solid #4ade80;
+            display: none;
+        }
+
+        .alen-photo.show {
+            display: block;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .progress {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 14px;
+        }
+
+        /* Cute masculino: detalles suaves sin perder la estética oscura */
+        body { justify-content: flex-start; padding-top: 42px; padding-bottom: 48px; }
+        .container { max-width: 560px; }
+        .container::before {
+            content: "✦  ✧  ✦";
+            display: block;
+            color: rgba(134, 239, 172, .55);
+            letter-spacing: 14px;
+            font-size: .85rem;
+            margin-bottom: 14px;
+        }
+        h1 { letter-spacing: -1px; }
+        .subtitle { color: #b7e8c2; }
+        .question-box, .comments-card {
+            background: linear-gradient(145deg, rgba(24, 39, 29, .88), rgba(13, 20, 16, .88));
+            border: 1px solid rgba(134, 239, 172, .25);
+            border-radius: 22px;
+            box-shadow: 0 14px 40px rgba(0,0,0,.22), inset 0 1px rgba(255,255,255,.035);
+        }
+        .btn {
+            border-radius: 14px;
+            border-width: 1px;
+            background: rgba(74, 222, 128, .08);
+            letter-spacing: .4px;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .option-btn {
+            border-radius: 14px;
+            text-align: center;
+            background: rgba(255,255,255,.045);
+        }
+        .option-btn.selected { box-shadow: 0 0 0 3px rgba(74,222,128,.12); }
+        .deco { filter: saturate(.8); }
+        .comments-card {
+            text-align: left;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        .comments-heading {
+            color: #b7f2c7;
+            font-size: 1.08rem;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+        .comments-subtitle, .comments-note {
+            color: #9cae9f;
+            font-size: .84rem;
+            line-height: 1.5;
+        }
+        .comment-form { display: flex; gap: 9px; margin: 15px 0 17px; }
+        .comment-input {
+            min-width: 0; flex: 1; padding: 13px 14px; border-radius: 13px;
+            border: 1px solid rgba(134,239,172,.28); background: rgba(0,0,0,.22);
+            color: white; font: inherit; outline: none;
+        }
+        .comment-input:focus { border-color: #86efac; box-shadow: 0 0 0 3px rgba(134,239,172,.1); }
+        .comment-input::placeholder { color: #829187; }
+        .comment-submit {
+            border: 1px solid #4ade80; color: #0b160e; background: #86efac;
+            border-radius: 13px; padding: 0 15px; font-weight: 700; cursor: pointer;
+        }
+        .comment-list { display: grid; gap: 9px; max-height: 260px; overflow-y: auto; }
+        .comment-item {
+            background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.07);
+            border-radius: 13px; padding: 11px 13px; overflow-wrap: anywhere;
+        }
+        .comment-date { color: #829187; font-size: .72rem; margin-bottom: 5px; }
+        .comment-text { color: #edf7ef; font-size: .92rem; line-height: 1.45; white-space: pre-wrap; }
+        .empty-comments { color: #829187; font-size: .88rem; padding: 8px 0; }
+        .comment-status { min-height: 18px; color: #fbbf24; font-size: .78rem; margin-top: 6px; }
+        @media (max-width: 440px) {
+            body { padding: 28px 14px; }
+            .comments-card { padding: 16px; }
+            .comment-form { flex-direction: column; }
+            .comment-submit { padding: 12px; }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <!-- Decoraciones -->
+    <div class="deco" style="top:8%; left:6%;">🎮</div>
+    <div class="deco" style="top:18%; right:7%;">🍗</div>
+    <div class="deco" style="top:55%; left:4%;">😴</div>
+    <div class="deco" style="top:70%; right:5%;">🔫</div>
+    <div class="deco" style="top:35%; left:9%;">🍕</div>
+    <div class="deco" style="top:85%; left:15%;">🏆</div>
+    <div class="deco" style="top:25%; right:12%;">🛏️</div>
+    <div class="deco" style="top:60%; right:10%;">🍔</div>
+
+    <div class="container">
+        <div id="start-screen">
+            <h1>Alen <span>The autistic person</span></h1>
+            <p class="subtitle">¿Cuánto sabes de Alen?</p>
+            <section class="comments-card" aria-label="Comentarios de la comunidad">
+                <div class="comments-heading">✧ El rincón de comentarios</div>
+                <p class="comments-subtitle">Deja algo sobre Alen o cualquier otro tema, o mira lo que han escrito los demás.</p>
+                <div class="comment-list" id="comments-start"><p class="empty-comments">Todavía no hay comentarios. ¡Puedes estrenar el muro!</p></div>
+            </section>
+            <button class="btn" onclick="startQuiz()">▶ EMPEZAR QUIZ</button>
+        </div>
+
+        <div class="quiz-section" id="quiz">
+            <div class="progress" id="progress">Pregunta 1 de 11</div>
+            
+            <div class="question-box">
+                <div class="question-text" id="question-text"></div>
+                <img id="question-img" class="question-img" src="" alt="imagen" style="display:none;">
+                <div class="options" id="options"></div>
+            </div>
+
+            <button class="btn" id="next-btn" onclick="nextQuestion()" style="display:none;">Siguiente →</button>
+        </div>
+
+        <div class="result-section" id="result">
+            <h1>Resultado</h1>
+            <div class="score-box" id="final-score">0 / 10</div>
+            <p id="score-message" style="color:#86efac; margin-bottom: 22px; font-size:1.15rem;"></p>
+            
+            <div id="alen-photo-container"></div>
+            
+            <section class="comments-card" aria-label="Comentarios de la comunidad">
+                <div class="comments-heading">✧ ¿Quieres dejar un comentario sobre Alen o cualquier otro tema?</div>
+                <p class="comments-subtitle">Puedes hacerlo. También puedes leer los comentarios que dejaron otros usuarios.</p>
+                <form class="comment-form" id="comment-form">
+                    <input class="comment-input" id="comment-input" type="text" maxlength="500" placeholder="Escribe lo que quieras..." aria-label="Escribe tu comentario" required>
+                    <button class="comment-submit" type="submit">Publicar ✦</button>
+                </form>
+                <p class="comment-status" id="comment-status" aria-live="polite"></p>
+                <div class="comment-list" id="comments-end"><p class="empty-comments">Todavía no hay comentarios.</p></div>
+                <p class="comments-note" style="margin-top:12px;">Por ahora, los comentarios se guardan en este navegador. Para compartirlos entre todos los visitantes hay que conectar una base de datos en línea.</p>
+            </section>
+            <button class="btn" onclick="location.reload()">Reintentar</button>
+        </div>
+    </div>
+
+    <script>
+        // Muro de comentarios: almacenamiento local provisional.
+        // Para que todos los visitantes compartan el mismo historial, conecta Supabase
+        // y sustituye estos valores por los de tu proyecto.
+        const SUPABASE_URL = "";
+        const SUPABASE_ANON_KEY = "";
+        const COMMENTS_TABLE = "comments";
+
+        let comments = [];
+        const localCommentsKey = "alen-site-comments-v1";
+
+        function escapeComment(value) {
+            return String(value).replace(/[&<>"']/g, char => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+            }[char]));
+        }
+
+        function formatCommentDate(value) {
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? "" : date.toLocaleString("es-GT", {
+                dateStyle: "medium", timeStyle: "short"
+            });
+        }
+
+        function renderComments() {
+            ["comments-start", "comments-end"].forEach(id => {
+                const list = document.getElementById(id);
+                if (!list) return;
+                list.innerHTML = "";
+                if (!comments.length) {
+                    list.innerHTML = '<p class="empty-comments">Todavía no hay comentarios. ¡Puedes estrenar el muro!</p>';
+                    return;
+                }
+                comments.forEach(comment => {
+                    const item = document.createElement("article");
+                    item.className = "comment-item";
+                    const date = document.createElement("div");
+                    date.className = "comment-date";
+                    date.textContent = formatCommentDate(comment.created_at);
+                    const body = document.createElement("div");
+                    body.className = "comment-text";
+                    body.textContent = comment.content;
+                    item.append(date, body);
+                    list.appendChild(item);
+                });
+            });
+        }
+
+        async function loadComments() {
+            if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+                try {
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/${COMMENTS_TABLE}?select=content,created_at&order=created_at.desc&limit=100`, {
+                        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+                    });
+                    if (!response.ok) throw new Error("No se pudo cargar el muro");
+                    comments = await response.json();
+                    renderComments();
+                    return;
+                } catch (error) {
+                    console.warn(error);
+                }
+            }
+            try { comments = JSON.parse(localStorage.getItem(localCommentsKey) || "[]"); }
+            catch { comments = []; }
+            renderComments();
+        }
+
+        async function publishComment(event) {
+            event.preventDefault();
+            const input = document.getElementById("comment-input");
+            const status = document.getElementById("comment-status");
+            const content = input.value.trim();
+            if (!content) return;
+            if (content.length > 500) {
+                status.textContent = "El comentario es demasiado largo (máximo 500 caracteres).";
+                return;
+            }
+            const entry = { content, created_at: new Date().toISOString() };
+
+            if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+                try {
+                    const response = await fetch(`${SUPABASE_URL}/rest/v1/${COMMENTS_TABLE}`, {
+                        method: "POST",
+                        headers: {
+                            apikey: SUPABASE_ANON_KEY,
+                            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+                            "Content-Type": "application/json",
+                            Prefer: "return=minimal"
+                        },
+                        body: JSON.stringify({ content })
+                    });
+                    if (!response.ok) throw new Error("No se pudo publicar");
+                    status.textContent = "¡Comentario publicado!";
+                    input.value = "";
+                    await loadComments();
+                    return;
+                } catch (error) {
+                    status.textContent = "No se pudo publicar en el muro compartido. Inténtalo de nuevo.";
+                    return;
+                }
+            }
+
+            comments.unshift(entry);
+            try { localStorage.setItem(localCommentsKey, JSON.stringify(comments)); }
+            catch { status.textContent = "No se pudo guardar el comentario en este navegador."; return; }
+            input.value = "";
+            status.textContent = "Guardado en este navegador (todavía no es visible para otros dispositivos).";
+            renderComments();
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadComments();
+            document.getElementById("comment-form")?.addEventListener("submit", publishComment);
+        });
+
+        const questions = [
+            // Preguntas originales
+            {
+                question: "¿A Alen le gusta estudiar?",
+                image: "https://images.pexels.com/photos/159751/book-address-book-learning-learn-159751.jpeg?auto=compress&cs=tinysrgb&w=600",
+                options: ["Sí", "No"],
+                correct: null,
+                type: "yesno"
+            },
+            {
+                question: "¿Cuál es el pasatiempo de Alen?",
+                image: null,
+                options: [
+                    { text: "A) Free Fire", img: "https://upload.wikimedia.org/wikipedia/en/thumb/d/db/Free_Fire_game_logo.png/220px-Free_Fire_game_logo.png" },
+                    { text: "B) Call of Duty", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Call_of_Duty_logo.svg/220px-Call_of_Duty_logo.svg.png" }
+                ],
+                correct: 0,
+                type: "image-options"
+            },
+            {
+                question: "¿Quién es la persona con la que Alen se proyecta?",
+                image: "https://images.pexels.com/photos/207983/pexels-photo-207983.jpeg?auto=compress&cs=tinysrgb&w=600",
+                options: ["A) Nataly", "B) Prima de Andy", "C) Ana"],
+                correct: 0,
+                type: "normal"
+            },
+            {
+                question: "¿Cuánto tiempo aprox duerme Alen?",
+                image: "https://images.pexels.com/photos/280257/pexels-photo-280257.jpeg?auto=compress&cs=tinysrgb&w=600",
+                options: ["A) 8 horas", "B) 6 horas", "C) 4 horas"],
+                correct: 1,
+                type: "normal"
+            },
+            {
+                question: "¿Alen tiene pechonalidad?",
+                image: "https://images.pexels.com/photos/1229356/pexels-photo-1229356.jpeg?auto=compress&cs=tinysrgb&w=600",
+                options: ["Sí", "No"],
+                correct: 0,
+                type: "yesno"
+            },
+            {
+                question: "¿Cuántas novias tuvo Alen?",
+                image: "https://images.pexels.com/photos/1024993/pexels-photo-1024993.jpeg?auto=compress&cs=tinysrgb&w=600",
+                options: ["A) 1", "B) 2", "C) 0"],
+                correct: 0,
+                type: "normal"
+            },
+
+            // ===== NUEVAS PREGUNTAS =====
+            {
+                question: "¿Alen es zurdo o derecho?",
+                image: null,
+                options: ["Zurdo", "Derecho"],
+                correct: 1,
+                type: "yesno"
+            },
+            {
+                question: "¿Cuáles son los apellidos de Alen?",
+                image: "https://images.pexels.com/photos/635499/pexels-photo-635499.jpeg?auto=compress&cs=tinysrgb&w=600", // caballo
+                options: ["Pérez Bautista", "Pérez López", "Quispe Huamán"],
+                correct: 0,
+                type: "normal"
+            },
+            {
+                question: "¿Alen tiene mascotas?",
+                image: "https://images.pexels.com/photos/2286776/pexels-photo-2286776.jpeg?auto=compress&cs=tinysrgb&w=600", // patata
+                options: ["Sí tiene", "No tiene", "5 + 5 = patata"],
+                correct: 2,
+                type: "normal"
+            },
+            {
+                question: "¿Podría Alen comenzar una tercera guerra mundial?",
+                image: "https://images.pexels.com/photos/1550337/pexels-photo-1550337.jpeg?auto=compress&cs=tinysrgb&w=600", // revolución / política
+                options: [
+                    "A) Si Beberly lo convence sí",
+                    "B) Él no haría eso",
+                    "C) Depende de si es un lunes en la tarde a las 2:53 pm en la costa primaveral"
+                ],
+                correct: 2,
+                type: "normal"
+            },
+
+            // Foto de Alen (última)
+            {
+                question: "¿Quieres ver una foto de Alen?",
+                image: null,
+                options: ["Sí", "No"],
+                correct: null,
+                type: "photo"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = null;
+        let showAlenPhoto = false;
+
+        function startQuiz() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('quiz').classList.add('active');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('progress').textContent = `Pregunta ${currentQuestion + 1} de ${questions.length}`;
+            document.getElementById('question-text').textContent = q.question;
+            
+            const imgEl = document.getElementById('question-img');
+            if (q.image) {
+                imgEl.src = q.image;
+                imgEl.style.display = 'block';
+            } else {
+                imgEl.style.display = 'none';
+            }
+
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            selectedAnswer = null;
+            document.getElementById('next-btn').style.display = 'none';
+
+            if (q.type === 'image-options') {
+                q.options.forEach((opt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.innerHTML = `
+                        <div style="display:flex;align-items:center;gap:12px;justify-content:center;">
+                            <img src="${opt.img}" style="height:38px;width:auto;border-radius:6px;" onerror="this.style.display='none'">
+                            <span>${opt.text}</span>
+                        </div>
+                    `;
+                    btn.onclick = () => selectOption(index, btn);
+                    optionsDiv.appendChild(btn);
+                });
+            } else {
+                q.options.forEach((opt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = typeof opt === 'string' ? opt : opt.text;
+                    btn.onclick = () => selectOption(index, btn);
+                    optionsDiv.appendChild(btn);
+                });
+            }
+        }
+
+        function selectOption(index, btn) {
+            document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedAnswer = index;
+            document.getElementById('next-btn').style.display = 'inline-block';
+        }
+
+        function nextQuestion() {
+            const q = questions[currentQuestion];
+
+            if (q.correct !== null && selectedAnswer === q.correct) {
+                score++;
+            }
+
+            if (q.type === 'photo' && selectedAnswer === 0) {
+                showAlenPhoto = true;
+            }
+
+            currentQuestion++;
+
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('quiz').classList.remove('active');
+            document.getElementById('result').classList.add('active');
+            
+            document.getElementById('final-score').textContent = `${score} / 10`;
+            
+            let message = '';
+            if (score >= 8) message = "Sabes demasiado del femboy Alen 🔥";
+            else if (score >= 5) message = "Más o menos conoces al femboy Alen...";
+            else message = "Uff, casi no sabes nada del femboy Alen 😂";
+            
+            document.getElementById('score-message').textContent = message;
+
+            if (showAlenPhoto) {
+                const container = document.getElementById('alen-photo-container');
+                container.innerHTML = `
+                    <p style="margin-bottom:12px;color:#4ade80;font-weight:600;">Foto del femboy Alen:</p>
+                    <img src="alen.jpg" 
+                         alt="Foto de Alen" 
+                         class="alen-photo show"
+                         style="max-width:280px;border-radius:16px;border:3px solid #4ade80;"
+                         onerror="this.src='https://via.placeholder.com/280x350/1a1a2e/4ade80?text=Pon+la+foto+como+alen.jpg'">
+                    <p style="font-size:0.85rem;color:#6b7280;margin-top:8px;">(Asegúrate de guardar la foto como <b>alen.jpg</b> en la misma carpeta)</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
